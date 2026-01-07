@@ -2,11 +2,12 @@
 
 This document must be updated daily every time you finish a work session.
 
-## Amy Smith  (CHANGE THIS!!!!! Also change the file name!)
+## Amrit Das.
 
-### 2026-01-06 In-Class - Brief description
+### 2026-01-06 - Brief description
 * Finding a group...eventually decided to go single
 * Thought about idea and wrote proposal during class.
+* Became more familiar w/ the mpg123 package and started fleshing out concepts more. Have to start coding. 
 
 ### 2024-01-03 - Brief description
 Expanded description including how much time was spent on task.
