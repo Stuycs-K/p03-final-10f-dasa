@@ -8,5 +8,5 @@ This document must be updated daily every time you finish a work session.
 * Finding a group...eventually decided to go single
 * Thought about idea and wrote proposal during class.
 
-### 2024-01-03 - Brief description
-Expanded description including how much time was spent on task.
+### 2026-01-07 - Brief description
+* Started looking at existing codebase from previous labs and resources to see how library/node can work and necessary edits
