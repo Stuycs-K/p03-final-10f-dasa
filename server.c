@@ -3,32 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-void rotX(char *s, int x) {
-  int len = strlen(s);
-  for (int a = 0; a < len; a++) {
-    int temp = *(s + a);
-    if (temp >= 'A' && temp <= 'Z') {
-      int z = temp + x;
-      if (z <= 'Z') {
-        *(s + a) = (char)z;
-      } else if (z >= 'Z') {
-        int sub = z - 'Z';
-        *(s + a) = (char)('A' + sub - 1);
-      }
-    } else if (temp >= 'a' && temp <= 'z') {
-      if (temp <= 'z') {
-        int o = temp + x;
-        if (o <= 'z') {
-          *(s + a) = (char)o;
-        } else if (o >= 'z') {
-          int sub = o - 'z';
-          *(s + a) = (char)('a' + sub - 1);
-        }
-      }
-    }
-  }
-}
+#include "node.h"
+#include "library.h"
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
@@ -37,6 +13,7 @@ static void sighandler(int signo) {
     exit(0);
   }
 }
+
 
 void subserver_logic(int client_socket) {
   char buff[256];
@@ -48,7 +25,6 @@ void subserver_logic(int client_socket) {
   buff[sizes] = '\0';
   char original[256];
   strcpy(original, buff);
-  rotX(buff, 13);
   printf("%s becomes: %s\n",original, buff);
   send(client_socket, buff, strlen(buff), 0);
 }

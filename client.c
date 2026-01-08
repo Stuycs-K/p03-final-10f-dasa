@@ -15,8 +15,8 @@ static void sighandler(int signo) {
 void clientLogic(int server_socket){
   char buff[256];
 
-  while(1){
-  printf("Please input a song-name: \n");
+  //while(1){
+  printf("Please input the first letter of the first name of the artist: ");
   if(fgets(buff,sizeof(buff), stdin) == NULL){
     printf("Client done.\n");
     close(server_socket);
@@ -26,7 +26,7 @@ void clientLogic(int server_socket){
   int len = strlen(buff);
   int bytes_sent;
   bytes_sent = send(server_socket, buff, len, 0);
-  //done sending
+  //sending the first letter of artist to the server. the recieve should be the list of artists with first letter.
 
   int sizes = recv(server_socket, buff, sizeof(buff) -1, 0);
   if(sizes == 0){
