@@ -17,10 +17,10 @@ The idea of a music library would be similar. I'm planning to have the user be a
 
 Class Topics(subject to modification): working with files, allocating memory, finding info about files, shared memory, pipes/sockets.
 
-I'm responsible for everything so yeah... 
+I'm responsible for everything so yeah...
 
 I plan to start by re-visting the lab where we worked on the music library and looking at the basic structure plus where it would be best to add modifications. I will then look at the server and forking pipe labs in order to gain inspiration for what each server/client interface will look like. Lastly, work with the mpg123 interface to actually load and modify songs.
 
 # Intended pacing:
 
-TBD. Have to go home today and check schedule for accurate pacing.
+I intend to work, first, on the actual library and editing that to better address my needs. I will then move on to user control and server-related things.

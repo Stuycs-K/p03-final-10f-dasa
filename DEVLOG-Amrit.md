@@ -9,5 +9,5 @@ This document must be updated daily every time you finish a work session.
 * Thought about idea and wrote proposal during class.
 * Became more familiar w/ the mpg123 package and started fleshing out concepts more. Have to start coding. 
 
-### 2024-01-03 - Brief description
-Expanded description including how much time was spent on task.
+### 2026-01-07 - Brief description
+* Started looking at existing codebase from previous labs and resources to see how library/node can work and necessary edits
