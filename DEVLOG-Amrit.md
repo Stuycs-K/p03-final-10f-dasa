@@ -11,3 +11,4 @@ This document must be updated daily every time you finish a work session.
 
 ### 2026-01-07 - Brief description
 * Started looking at existing codebase from previous labs and resources to see how library/node can work and necessary edits
+* Did this both in-class and for HW

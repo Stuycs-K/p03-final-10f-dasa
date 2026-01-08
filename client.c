@@ -16,7 +16,7 @@ void clientLogic(int server_socket){
   char buff[256];
 
   while(1){
-  printf("Please input a string: \n");
+  printf("Please input a song-name: \n");
   if(fgets(buff,sizeof(buff), stdin) == NULL){
     printf("Client done.\n");
     close(server_socket);
