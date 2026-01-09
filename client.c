@@ -44,6 +44,11 @@ void clientLogic(int server_socket){
   }
 
   printf("Recieving %d songs from server...\n", count);
+
+  struct song_node *local_library = NULL;
+  struct song_node *tail = NULL;
+
+  
 }
 
 int main(int argc, char *argv[] ) {
