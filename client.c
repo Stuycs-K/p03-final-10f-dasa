@@ -1,10 +1,13 @@
 #include "networking.h"
+#include "node.h"
+#include "library.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
+
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
