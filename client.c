@@ -53,35 +53,18 @@ void clientLogic(int server_socket){
 
   for(int x = 0; x < count; x++){
     struct song_node temps;
-    bytes = recv(server_socket, &temps, sizeof(struct song_node), 0);
+    bytes = recv(server_socket, &temps, sizeof(struct song_node),0);
     if(bytes <= 0){
-      printf("Error reciving song %d.\n", x + 1);
+      printf("Error recieving song %d.\n", x+1);
       break;
     }
-
-    struct song_node *new_node = malloc(sizeof(struct song_node));
-    if(!new_node){
-      printf("Memory allocation failed.\n");
-      break;
-    }
-
-    strcpy(new_node-> name, temps.name);
-    strcpy(new_node-> artist, temps.artist);
-    new_node -> next = NULL;
-
-    if(local_library == NULL){
-      local_library = new_node;
-      tail = new_node;
-    } else{
-      tail->next = new_node;
-      tail = new_node;
-    }
+    local_library = insert_front(local_library, temps.artist, temps.title);
   }
   close(server_socket);
   printf("Local Sub-Library\n");
   struct song_node *curr = local_library;
   while(curr != NULL){
-    printf("%s - %s\n", curr -> artist, curr-> name);
+    printf("%s - %s\n", curr -> artist, curr-> artist);
     curr = curr-> next;
   }
 
