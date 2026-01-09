@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <fcntl.h>
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
@@ -14,30 +16,34 @@ static void sighandler(int signo) {
 
 void clientLogic(int server_socket){
   char buff[256];
-
-  //while(1){
   printf("Please input the first letter of the first name of the artist: ");
-  if(fgets(buff,sizeof(buff), stdin) == NULL){
+  if(fgets(buff,sizeof(buff),stdin) == NULL){
     printf("Client done.\n");
     close(server_socket);
     return;
   }
-  //prompted user for string
-  int len = strlen(buff);
-  int bytes_sent;
-  bytes_sent = send(server_socket, buff, len, 0);
-  //sending the first letter of artist to the server. the recieve should be the list of artists with first letter.
-
-  int sizes = recv(server_socket, buff, sizeof(buff) -1, 0);
-  if(sizes == 0){
-    printf("Server closed\n");
+  if(buff[0] == '\n' || buff[0] == '\0'){
+    printf("No input provided.\n");
     close(server_socket);
     return;
   }
-  buff[sizes] = '\0';
-  printf("Recieved string: %s\n", buff);
-  //exit(1);
+
+  char letter = buff[0];
+  if(send(server_socket, &letter, 1, 0) <=0 ){
+    printf("Failed to send letter.\n");
+    close(server_socket);
+    return;
   }
+
+  int count = 0;
+  int bytes = recv(server_socket, &count, sizeof(int), 0);
+  if(bytes <= 0){
+    printf("Failed to recieve songs. \n");
+    close(server_socket);
+    return;
+  }
+
+  printf("Recieving %d songs from server...\n", count);
 }
 
 int main(int argc, char *argv[] ) {
