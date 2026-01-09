@@ -15,3 +15,6 @@ This document must be updated daily every time you finish a work session.
 
 ### 2026-01-08- Brief description
 * Started to modify both client and server to have an orderly way to access songs. Needs to be a sort of controlled/well-oriented thing.
+
+### 2026-01-09- Brief description
+* Heavy hardcoding of client and server to best align to the needs of this project. ClientLogic done first, followed by the Server/SubserverLogic(might be done over the weekend)
