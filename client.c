@@ -64,7 +64,7 @@ void clientLogic(int server_socket){
   printf("Local Sub-Library\n");
   struct song_node *curr = local_library;
   while(curr != NULL){
-    printf("%s - %s\n", curr -> artist, curr-> artist);
+    printf("%s - %s\n", curr -> artist, curr-> title);
     curr = curr-> next;
   }
 

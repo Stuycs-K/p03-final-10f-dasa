@@ -173,7 +173,7 @@ void shuffle(struct song_node **library, int n){
 
         if(finder != NULL){
             print_song_node(*finder);
-            x++;
+            //x++;
         }
     }
 }
