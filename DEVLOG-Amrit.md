@@ -18,3 +18,7 @@ This document must be updated daily every time you finish a work session.
 
 ### 2026-01-09- Brief description
 * Heavy hardcoding of client and server to best align to the needs of this project. ClientLogic done first, followed by the Server/SubserverLogic(might be done over the weekend)
+* Should be done with the server/client side of things. Now need to do some actual testing before moving to mpg123
+
+### 2026-01-12- Brief description
+* Debugging the server sending songs. I need to make sure, today or early tomorrow, that the songs are sending well. Need to focus on the debugging of the actual library/node things.

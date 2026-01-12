@@ -55,7 +55,7 @@ void subserver_logic(int client_socket, struct song_node ** library) {
 }
 
 int main(int argc, char *argv[]) {
-  /*
+
   printf("LINKED LIST TESTS\n====================================\n");
 
   struct song_node * list = NULL;
@@ -105,76 +105,12 @@ int main(int argc, char *argv[]) {
   list = insert_front(list, "#1 Dads", "So Soldier");
   list = insert_front(list, "50 Cent", "In Da Club");
 
-  printf("Testing print_list:\n\t");
-  print_song_list(list);
-  printf("\n====================================\n");
-
-  printf("Testing print_node:\n\t");
-  print_song_node(*list);
-  printf("\n====================================\n");
-
-  printf("Testing find_node:\n");
-  struct song_node * found = find_song("Taylor Swift", "Shake It Off", list);
-  if(found) printf("\tnode found! [%s, %s]\n", found->artist, found->title);
-  else printf("\tnode not found\n");
-
-  found = find_song("Taylor Swift", "Delicate", list);
-  if(found) printf("\tnode found! [%s, %s]\n", found->artist, found->title);
-  else printf("\tnode not found\n");
-
-  printf("====================================\nTesting find_artist:\n");
-  struct song_node * artist_found = find_first("Frank Sinatra", list);
-  if(artist_found) {
-      printf("\tartist found! [");
-      struct song_node * current = artist_found;
-      while(current) {
-          printf("[%s, %s]|", current->artist, current->title);
-          current = current->next;
-      }
-      printf(" ]\n");
-  } else {
-      printf("\tartist not found\n");
-  }
-
-  artist_found = find_first("Taylor Swift", list);
-  if(artist_found) {
-      printf("\tartist found! [");
-      struct song_node * current = artist_found;
-      while(current) {
-          printf("[%s, %s]|", current->artist, current->title);
-          current = current->next;
-      }
-      printf(" ]\n");
-  } else {
-      printf("\tartist not found\n");
-  }
-
-  artist_found = find_first("Adele", list);
-  if(artist_found) printf("\tartist found!\n");
-  else printf("\tartist not found\n");
-
-  printf("====================================\nTesting remove:\n");
-  list = remove_song(list, "Taylor Swift", "Love Story");
-  print_song_list(list);
-  printf("\n");
-
-  list = remove_song(list, "Frank Sinatra", "Fly Me to the Moon");
-  print_song_list(list);
-  printf("\n");
-
-  list = remove_song(list, "Katy Perry", "Roar");
-  print_song_list(list);
-  printf("\n");
-
-  printf("====================================\nTesting free_list\n");
-  freeing(list);
-  list = NULL;
-  printf("list after free_list:\n\n");
-*/
+  struct song_node ** library = init();
+/*
   printf("MUSIC LIBRARY TESTS\n====================================\n");
 
   struct song_node ** library = init();
-
+  printf("init works\n");
   add(library, "Taylor Swift", "Love Story");
   add(library, "Taylor Swift", "Blank Space");
   add(library, "Taylor Swift", "Shake It Off");
@@ -220,6 +156,7 @@ int main(int argc, char *argv[]) {
   add(library, "#1 Dads", "So Soldier");
   add(library, "50 Cent", "In Da Club");
 
+  /*
   printf("Testing print_letter\n");
   print_letter(library, 'T');
   printf("\n");
@@ -255,6 +192,10 @@ int main(int argc, char *argv[]) {
   printf("Printing [Katy Perry]\n");
   print_artist(library, "Katy Perry");
   printf("\n");
+*/
+  // the above part uploads songs while the below part is the server client setup aspect
+
+
   signal(SIGINT, sighandler);
   printf("bind complete\n");
   int listen_socket = server_setup();
