@@ -105,13 +105,15 @@ int main(int argc, char *argv[]) {
   list = insert_front(list, "#1 Dads", "So Soldier");
   list = insert_front(list, "50 Cent", "In Da Club");
 
-  struct song_node ** library = init();
-/*
-  printf("MUSIC LIBRARY TESTS\n====================================\n");
+  list = NULL;
 
   struct song_node ** library = init();
+
+  printf("MUSIC LIBRARY TESTS\n====================================\n");
+
   printf("init works\n");
   add(library, "Taylor Swift", "Love Story");
+  /*
   add(library, "Taylor Swift", "Blank Space");
   add(library, "Taylor Swift", "Shake It Off");
   add(library, "Taylor Swift", "You Belong With Me");

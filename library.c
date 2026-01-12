@@ -14,7 +14,7 @@ struct song_node ** init(){
 void add(struct song_node** library, char* artist, char* title) {
     if (!artist || !title) return;
 
-    int index = *artist - 'A';
+    int index = artist - 'A';
     if (index < 0 || index > 25) index = 26;
 
     struct song_node *access = library[index];
@@ -33,8 +33,8 @@ void add(struct song_node** library, char* artist, char* title) {
         current = current->next;
     }
 
-    new_node->next = current->next;
-    current->next = new_node;
+    new_node-> next = current-> next;
+    current-> next = new_node;
 }
 
 struct song_node * search_song(struct song_node ** library, char* artist, char* title) {
