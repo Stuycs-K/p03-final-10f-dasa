@@ -36,7 +36,7 @@ void sub_libr_send(int client_socket, struct song_node * list){
 }
 
 
-void subserver_logic(int client_socket) {
+void subserver_logic(int client_socket, struct song_node ** library) {
   char letter;
   int sizes = recv(client_socket, &letter, sizeof(letter), 0);
   if(sizes <= 0){
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     if (subserver == 0) {
       close(listen_socket);
       while (1) {
-        subserver_logic(client_socket);
+        subserver_logic(client_socket, library);
         //sleep(1);
       }
       //close(listen_socket);

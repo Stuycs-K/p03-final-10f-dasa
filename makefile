@@ -2,11 +2,11 @@
 
 .PHONY: clean compile
 
-server: server.o networking.o
-	@gcc -o server server.o networking.o
+server: server.o networking.o node.o library.o
+	@gcc -o server server.o networking.o node.o library.o
 	@./server
-client: client.o networking.o
-	@gcc -o client client.o networking.o
+client: client.o networking.o node.o library.o
+	@gcc -o client client.o networking.o node.o library.o
 	@./client
 compile: client.o server.o networking.o
 	@gcc -o client client.o networking.o -lm
@@ -14,7 +14,7 @@ compile: client.o server.o networking.o
 server.o: server.c server.h networking.h node.h library.h
 	@gcc -c server.c
 client.o: client.c client.h networking.h node.h library.h
-	@gcc -c client.c 
+	@gcc -c client.c
 networking.o: networking.c networking.h
 	@gcc -c networking.c
 library.o: library.c library.h node.h
@@ -24,4 +24,3 @@ node.o: node.c node.h
 
 clean:
 	@rm -f *.o
-
