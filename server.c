@@ -6,6 +6,8 @@
 #include "node.h"
 #include "library.h"
 
+
+
 static void sighandler(int signo) {
   if (signo == SIGINT) {
     //remove(WKP);
@@ -42,14 +44,18 @@ void subserver_logic(int client_socket) {
     close(client_socket);
     exit(1);
   }
-  buff[sizes] = '\0';
-  char original[256];
-  strcpy(original, buff);
-  printf("%s becomes: %s\n",original, buff);
-  send(client_socket, buff, strlen(buff), 0);
+  printf("Client requested letter: %s\n", letter);
+  int index = letter - 'a';
+  if(index < 0 || index > 25){
+    int zero = 0;
+    send(client_socket, &zero, sizeof(int), 0);
+    return;
+  }
+  sub_libr_send(client_socket, library[index]);
 }
 
 int main(int argc, char *argv[]) {
+  struct song_node ** library = init();
   signal(SIGINT, sighandler);
   printf("bind complete\n");
   int listen_socket = server_setup();
