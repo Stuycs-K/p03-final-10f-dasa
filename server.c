@@ -14,12 +14,32 @@ static void sighandler(int signo) {
   }
 }
 
+void sub_libr_send(int client_socket, struct song_node * list){
+  struct song_node *current = list;
+  int count = 0;
+
+  while(current != NULL){
+    count++;
+    current = current -> next;
+  }
+
+  send(client_socket, &count, sizeof(int),0);
+
+  current = list;
+  while(current != NULL){
+    send(client_socket, current -> artist, sizeof(current -> artist),0);
+    send(client_socket, current -> title, sizeof(current -> title), 0);
+    current = current -> next;
+  }
+}
+
 
 void subserver_logic(int client_socket) {
-  char buff[256];
-  int sizes = recv(client_socket, buff, sizeof(buff) - 1, 0);
+  char letter;
+  int sizes = recv(client_socket, &letter, sizeof(letter), 0);
   if(sizes <= 0){
     printf("Socket closed.\n");
+    close(client_socket);
     exit(1);
   }
   buff[sizes] = '\0';
