@@ -6,7 +6,7 @@
 struct song_node{char artist[100];char title[100]; struct song_node *next;};
 //ok below is needed
 int print_song_node(struct song_node m){
-	printf("%s, %s, %p\n", m.artist, m.title, m.next);
+	printf("%s, %s \n", m.artist, m.title);
 	return 0;
 }
 //below is needed just might need some modifications depending on how i want each thing to be....seems to be especially true if i want to do mpg files

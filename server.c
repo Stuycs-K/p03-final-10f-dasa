@@ -29,8 +29,16 @@ void sub_libr_send(int client_socket, struct song_node * list){
 
   current = list;
   while(current != NULL){
-    send(client_socket, current -> artist, sizeof(current -> artist),0);
-    send(client_socket, current -> title, sizeof(current -> title), 0);
+    char tempa[sizeof(current -> artist)] = current -> artist;
+    char temps[sizeof(current -> title)] = current -> title;
+    char dashes[1] = "-";
+    strcat(tempa, dashes);
+    strcat(tempa, temps);
+    send(client_socket, tempa, sizeof(tempa), 0);
+    //send(client_socket, current -> artist, sizeof(current -> artist),0);
+    //send(client_socket, current -> title, sizeof(current -> title), 0);
+    tempa = NULL;
+    temps = NULL;
     current = current -> next;
   }
 }
@@ -113,7 +121,6 @@ int main(int argc, char *argv[]) {
 
   printf("init works\n");
   add(library, "Taylor Swift", "Love Story");
-  /*
   add(library, "Taylor Swift", "Blank Space");
   add(library, "Taylor Swift", "Shake It Off");
   add(library, "Taylor Swift", "You Belong With Me");
