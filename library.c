@@ -14,10 +14,13 @@ struct song_node ** init(){
 void add(struct song_node** library, char* artist, char* title) {
     if (!artist || !title) return;
 
-    int index = artist - 'A';
+    int index = *artist - 'A';
     if (index < 0 || index > 25) index = 26;
 
     struct song_node *access = library[index];
+    if(library == NULL){
+        exit(0);
+    }
     struct song_node *new_node = createnode(artist, title, NULL);
 
     if (!access || compare(new_node, access) < 0)
@@ -56,6 +59,9 @@ struct song_node * search_song(struct song_node ** library, char* artist, char* 
 
 struct song_node * search_artist(struct song_node**library, char*artist, char*title){
   int x = *artist - 'A';
+  if(x <0 || x> 25){
+    x=26;
+  }
   struct song_node * access = library[x];
   return find_first(artist, access);
 }
@@ -76,6 +82,9 @@ void print_list(struct song_node * list){
 
 void print_letter(struct song_node ** library, char letter){
     int index = letter - 'A';
+    if(index <0 || index > 25){
+        index = 26;
+    }
     struct song_node * current = library[index];
     print_list(current);
 }

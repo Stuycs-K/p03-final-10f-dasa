@@ -44,8 +44,8 @@ void subserver_logic(int client_socket, struct song_node ** library) {
     close(client_socket);
     exit(1);
   }
-  printf("Client requested letter: %s\n", letter);
-  int index = letter - 'a';
+  printf("Client requested letter: %c\n", letter);
+  int index = letter - 'A';
   if(index < 0 || index > 25){
     int zero = 0;
     send(client_socket, &zero, sizeof(int), 0);
