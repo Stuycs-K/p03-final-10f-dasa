@@ -7,6 +7,7 @@
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <mpg123.h>
 
 
 static void sighandler(int signo) {

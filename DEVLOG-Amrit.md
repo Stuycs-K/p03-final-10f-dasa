@@ -22,3 +22,7 @@ This document must be updated daily every time you finish a work session.
 
 ### 2026-01-12- Brief description
 * Debugging the server sending songs. I need to make sure, today or early tomorrow, that the songs are sending well. Need to focus on the debugging of the actual library/node things.
+* Ensured that the server/client modality is working
+
+### 2026-01-13- Brief description
+* Started by just refreshing on the server/client working. It is working there is just a small sending/printing error which will be dealt with at a later time.
