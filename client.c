@@ -101,6 +101,7 @@ void clientLogic(int server_socket){
   if(commands == 'd'){
     char deleters[256] = "mpg123 -C s\0";
     strcpy(wants,players);
+    execvp("rm ")
   }
 
   close(server_socket);

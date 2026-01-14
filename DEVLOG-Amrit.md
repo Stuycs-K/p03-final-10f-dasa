@@ -27,3 +27,6 @@ This document must be updated daily every time you finish a work session.
 ### 2026-01-13- Brief description
 * Started by just refreshing on the server/client working. It is working there is just a small sending/printing error which will be dealt with at a later time.
 * At home: started working on mpg123 stuff. However, unfortunately not working too well on mac
+
+### 2026-01-14- Brief description
+* Worked on better understanding mpg123 and updating the client side to deal with commands and interactions with mpg123
