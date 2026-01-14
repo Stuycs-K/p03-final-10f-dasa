@@ -52,7 +52,7 @@ void clientLogic(int server_socket){
     printf("%s\n", songs[x]);
   }
   for(int x = 0; x < count; x++){
-    free(songs[x]);  
+    free(songs[x]);
   }
   free(songs);
 
@@ -77,8 +77,34 @@ void clientLogic(int server_socket){
     buff[strlen(buff) - 1] = '\0';
   }
   send(server_socket, buff, strlen(buff) + 1, 0);
+
+
+  printf("Enjoy the song. If you would like to pause press p; exit press q; delete song press d; go to the next song press n. Command: \n");
+  char commands;
+  char wants[256];
+  fgets(commands, sizeof(commands), stdin);
+  if(buff[strlen(buff) - 1] == '\n'){
+    buff[strlen(buff) - 1] = '\0';
+  }
+  if(commands != 'p' || commands != 'q' || commands != 'd' || commands != 'n'){
+    printf("Wrong command. Client is quitting....You ruined it.\n");
+    exit(1);
+  }
+  if(commands == 'p'){
+    char players[256] = "mpg123 -C s\0";
+    strcpy(wants,players);
+  }
+  if(commands == 'q'){
+    char quitters[256] = "mpg123 -C q\0";
+    strcpy(wants,quitters);
+  }
+  if(commands == 'd'){
+    char deleters[256] = "mpg123 -C s\0";
+    strcpy(wants,players);
+  }
+
   close(server_socket);
-  
+
   }
 
 int main(int argc, char *argv[] ) {

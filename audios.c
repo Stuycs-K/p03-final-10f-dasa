@@ -1,4 +1,3 @@
-#include <mpg123.h>
 #include "networking.h"
 #include <math.h>
 #include <stdio.h>
@@ -10,6 +9,7 @@
 #include "client.h"
 
 void playing(char * filename){
+  execvp("mpg123")
   mpg123_handle *mh;
   char *buffer;
   size_t buffer_size;
