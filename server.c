@@ -16,32 +16,6 @@ static void sighandler(int signo) {
   }
 }
 
-void sub_libr_send(int client_socket, struct song_node * list){
-  struct song_node *current = list;
-  int count = 0;
-
-  while(current != NULL){
-    count++;
-    current = current -> next;
-  }
-
-  send(client_socket, &count, sizeof(int),0);
-
-  current = list;
-  while(current != NULL){
-    char tempa[256];   // big enough for artist + "-" + title
-
-    strcpy(tempa, current->artist);
-    strcat(tempa, " - ");
-    strcat(tempa, current->title);
-
-    // send ONLY the string + null terminator
-    send(client_socket, tempa, strlen(tempa) + 1, 0);
-
-    current = current->next;
-  }
-}
-
 
 void subserver_logic(int client_socket, struct song_node ** library) {
   char letter;
@@ -52,13 +26,13 @@ void subserver_logic(int client_socket, struct song_node ** library) {
     exit(1);
   }
   printf("Client requested letter: %c\n", letter);
-  int index = letter - 'A';
-  if(index < 0 || index > 25){
-    int zero = 0;
-    send(client_socket, &zero, sizeof(int), 0);
-    return;
+  int count;
+  char ** songs = by_letter(library, letter, &count);
+  send(client_socket, &count, sizeof(int), 0);
+  for(int x =0; x < count; x++){
+    send(client_socket, songs[x], strlen(songs[x]) + 1, 0);
   }
-  sub_libr_send(client_socket, library[index]);
+  free_song_array(songs, count);
 
   //getting artist name
   char artist[256];
@@ -67,13 +41,24 @@ void subserver_logic(int client_socket, struct song_node ** library) {
     close(client_socket);
     exit(1);
   }
-  int artist_count = 0;
-  for(int x = 0; x < 27; x++){
-    struct song_node *node = library[x];
-    while(node != NULL){
-      
-    }
+  songs = by_artist(library, artist, &count);
+  send(client_socket, &count, sizeof(int), 0);
+  for(int x = 0; x < count; x++){
+    send(client_socket, songs[x], strlen(songs[x]) + 1, 0);
   }
+  free_song_array(songs, count);
+
+  char title[256];
+  sizes = recv(client_socket,title, sizeof(title),0);
+  if(sizes <= 0){
+    close(client_socket);
+    exit(1);
+  }
+  struct song_node *song = search_song(library, artist, title);
+  char buffer[256];
+  sprintf(buffer, "%s - %s", song-> artist, song-> title);
+  int len = strlen(buffer) + 1;
+  send(client_socket, buffer, len, 0);
 }
 
 int main(int argc, char *argv[]) {
