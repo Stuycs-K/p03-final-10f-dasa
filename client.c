@@ -20,12 +20,15 @@ static void sighandler(int signo) {
 
 void clientLogic(int server_socket){
   char buff[256];
+
+
   printf("Please input the first letter of the first name of the artist: ");
   if(fgets(buff,sizeof(buff),stdin) == NULL){
     printf("Client done.\n");
     close(server_socket);
     return;
   }
+
   if(buff[0] == '\n' || buff[0] == '\0'){
     printf("No input provided.\n");
     close(server_socket);
@@ -39,55 +42,44 @@ void clientLogic(int server_socket){
     return;
   }
 
-  int count = 0;
+  int count;
   int bytes = recv(server_socket, &count, sizeof(int), 0);
-  if(bytes <= 0){
-    printf("Failed to recieve songs. \n");
-    close(server_socket);
-    return;
-  }
-
-  printf("Recieving %d songs from server...\n", count);
-
-  struct song_node *local_library = NULL;
-  struct song_node *tail = NULL;
-
+  char **songs = malloc(sizeof(char* )* count);
+  printf("Songs for letter %c: \n", letter);
   for(int x = 0; x < count; x++){
-    char buffer[256];
-
-    bytes = recv(server_socket, buffer, sizeof(buffer), 0);
-    if(bytes <= 0){
-        printf("Error receiving song %d.\n", x+1);
-        break;
-    }
-
-    buffer[bytes] = '\0';
-
-    // buffer format: "Artist - Title"
-    char *dash = strstr(buffer, " - ");
-    if(dash == NULL){
-        printf("Malformed song received: %s\n", buffer);
-        continue;
-    }
-
-    *dash = '\0';  // split string
-    char *artist = buffer;
-    char *title = dash + 3;
-
-    local_library = insert_front(local_library, artist, title);
+    songs[x] = malloc(256);
+    recv(server_socket, songs[x], 256,0);
+    printf("%s\n", songs[x]);
   }
+  for(int x = 0; x < count; x++){
+    free(songs[x]);  
+  }
+  free(songs);
+
+  printf("Enter artist: ");
+  fgets(buff, sizeof(buff), stdin);
+  if(buff[strlen(buff) - 1] == '\n'){
+    buff[strlen(buff) - 1] = '\0';
+  }
+  send(server_socket, buff, strlen(buff) + 1, 0);
+
+  recv(server_socket, &count, sizeof(int), 0);
+  songs = malloc(count * sizeof(char*));
+  for(int x = 0; x < count; x++){
+    songs[x] = malloc(256);
+    recv(server_socket, songs[x], 256,0);
+    printf("%d: %s\n", x + 1, songs[x]);
+  }
+
+  printf("Choose song: ");
+  fgets(buff,sizeof(buff), stdin);
+  if(buff[strlen(buff) -1] == '\n'){
+    buff[strlen(buff) - 1] = '\0';
+  }
+  send(server_socket, buff, strlen(buff) + 1, 0);
   close(server_socket);
-  printf("Local Sub-Library\n");
-  struct song_node *curr = local_library;
-  while(curr != NULL){
-    printf("%s - %s\n", curr -> artist, curr-> title);
-    curr = curr-> next;
+  
   }
-
-  printf("\n");
-
-
-}
 
 int main(int argc, char *argv[] ) {
   char* IP = "127.0.0.1";
