@@ -7,7 +7,7 @@
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <mpg123.h>
+//#include <mpg123.h>
 
 
 static void sighandler(int signo) {
@@ -53,13 +53,28 @@ void clientLogic(int server_socket){
   struct song_node *tail = NULL;
 
   for(int x = 0; x < count; x++){
-    struct song_node temps;
-    bytes = recv(server_socket, &temps, sizeof(struct song_node),0);
+    char buffer[256];
+
+    bytes = recv(server_socket, buffer, sizeof(buffer), 0);
     if(bytes <= 0){
-      printf("Error recieving song %d.\n", x+1);
-      break;
+        printf("Error receiving song %d.\n", x+1);
+        break;
     }
-    local_library = insert_front(local_library, temps.artist, temps.title);
+
+    buffer[bytes] = '\0';
+
+    // buffer format: "Artist - Title"
+    char *dash = strstr(buffer, " - ");
+    if(dash == NULL){
+        printf("Malformed song received: %s\n", buffer);
+        continue;
+    }
+
+    *dash = '\0';  // split string
+    char *artist = buffer;
+    char *title = dash + 3;
+
+    local_library = insert_front(local_library, artist, title);
   }
   close(server_socket);
   printf("Local Sub-Library\n");

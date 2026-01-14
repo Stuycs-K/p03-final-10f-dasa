@@ -29,17 +29,16 @@ void sub_libr_send(int client_socket, struct song_node * list){
 
   current = list;
   while(current != NULL){
-    char tempa[sizeof(current -> artist)] = current -> artist;
-    char temps[sizeof(current -> title)] = current -> title;
-    char dashes[1] = "-";
-    strcat(tempa, dashes);
-    strcat(tempa, temps);
-    send(client_socket, tempa, sizeof(tempa), 0);
-    //send(client_socket, current -> artist, sizeof(current -> artist),0);
-    //send(client_socket, current -> title, sizeof(current -> title), 0);
-    tempa = NULL;
-    temps = NULL;
-    current = current -> next;
+    char tempa[256];   // big enough for artist + "-" + title
+
+    strcpy(tempa, current->artist);
+    strcat(tempa, " - ");
+    strcat(tempa, current->title);
+
+    // send ONLY the string + null terminator
+    send(client_socket, tempa, strlen(tempa) + 1, 0);
+
+    current = current->next;
   }
 }
 
@@ -60,6 +59,21 @@ void subserver_logic(int client_socket, struct song_node ** library) {
     return;
   }
   sub_libr_send(client_socket, library[index]);
+
+  //getting artist name
+  char artist[256];
+  sizes = recv(client_socket, artist, sizeof(artist), 0);
+  if(sizes <= 0){
+    close(client_socket);
+    exit(1);
+  }
+  int artist_count = 0;
+  for(int x = 0; x < 27; x++){
+    struct song_node *node = library[x];
+    while(node != NULL){
+      
+    }
+  }
 }
 
 int main(int argc, char *argv[]) {
