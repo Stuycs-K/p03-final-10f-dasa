@@ -1,4 +1,4 @@
-#include "networking.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,19 +7,25 @@
 #include "library.h"
 #include "server.h"
 #include "client.h"
+#include <string.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <sys/wait.h>
 
-void playing(char * filename){
-  execvp("mpg123")
-  mpg123_handle *mh;
-  char *buffer;
-  size_t buffer_size;
-  size_t done;
-  int err;
-
-  if(mpg123_init() != MPG123_OK){
+int play_song(char * song_path){
+  int pid = fork();
+  if(pid == 0){
+    char * args[] = {"mpg123", song_path, NULL};
+    execvp("mpg123", args);
     exit(1);
   }
 
-  mh = mpg123_new(NULL, &err);
+  return pid;
+}
 
+void stop_song(int pid){
+  if(pid > 0){
+    kill(pid, SIGTERM);
+    waitpid(pid, NULL, 0);
+  }
 }

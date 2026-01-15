@@ -1,14 +1,13 @@
+#include "library.h"
 #include "networking.h"
 #include "node.h"
-#include "library.h"
-#include <unistd.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-#include <fcntl.h>
-//#include <mpg123.h>
-
+#include <unistd.h>
+// #include <mpg123.h>
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
@@ -17,26 +16,24 @@ static void sighandler(int signo) {
   }
 }
 
-
-void clientLogic(int server_socket){
+void clientLogic(int server_socket) {
   char buff[256];
 
-
   printf("Please input the first letter of the first name of the artist: ");
-  if(fgets(buff,sizeof(buff),stdin) == NULL){
+  if (fgets(buff, sizeof(buff), stdin) == NULL) {
     printf("Client done.\n");
     close(server_socket);
     return;
   }
 
-  if(buff[0] == '\n' || buff[0] == '\0'){
+  if (buff[0] == '\n' || buff[0] == '\0') {
     printf("No input provided.\n");
     close(server_socket);
     return;
   }
 
   char letter = buff[0];
-  if(send(server_socket, &letter, 1, 0) <=0 ){
+  if (send(server_socket, &letter, 1, 0) <= 0) {
     printf("Failed to send letter.\n");
     close(server_socket);
     return;
@@ -44,78 +41,87 @@ void clientLogic(int server_socket){
 
   int count;
   int bytes = recv(server_socket, &count, sizeof(int), 0);
-  char **songs = malloc(sizeof(char* )* count);
+  char **songs = malloc(sizeof(char *) * count);
   printf("Songs for letter %c: \n", letter);
-  for(int x = 0; x < count; x++){
+  for (int x = 0; x < count; x++) {
     songs[x] = malloc(256);
-    recv(server_socket, songs[x], 256,0);
+    recv(server_socket, songs[x], 256, 0);
     printf("%s\n", songs[x]);
   }
-  for(int x = 0; x < count; x++){
+  for (int x = 0; x < count; x++) {
     free(songs[x]);
   }
   free(songs);
 
   printf("Enter artist: ");
   fgets(buff, sizeof(buff), stdin);
-  if(buff[strlen(buff) - 1] == '\n'){
+  if (buff[strlen(buff) - 1] == '\n') {
     buff[strlen(buff) - 1] = '\0';
   }
   send(server_socket, buff, strlen(buff) + 1, 0);
 
   recv(server_socket, &count, sizeof(int), 0);
-  songs = malloc(count * sizeof(char*));
-  for(int x = 0; x < count; x++){
+  songs = malloc(count * sizeof(char *));
+  for (int x = 0; x < count; x++) {
     songs[x] = malloc(256);
-    recv(server_socket, songs[x], 256,0);
+    recv(server_socket, songs[x], 256, 0);
     printf("%d: %s\n", x + 1, songs[x]);
   }
 
   printf("Choose song: ");
-  fgets(buff,sizeof(buff), stdin);
-  if(buff[strlen(buff) -1] == '\n'){
+  fgets(buff, sizeof(buff), stdin);
+  if (buff[strlen(buff) - 1] == '\n') {
     buff[strlen(buff) - 1] = '\0';
   }
   send(server_socket, buff, strlen(buff) + 1, 0);
 
+  printf("Enjoy the song. If you would like to pause press p; exit press q; "
+         "delete song press d; go to the next song press n. Command: \n");
 
-  printf("Enjoy the song. If you would like to pause press p; exit press q; delete song press d; go to the next song press n. Command: \n");
-  char commands;
+  
+  char commands[2]; 
   char wants[256];
-  fgets(commands, sizeof(commands), stdin);
-  if(buff[strlen(buff) - 1] == '\n'){
-    buff[strlen(buff) - 1] = '\0';
+
+  
+  if (fgets(commands, sizeof(commands), stdin) == NULL) {
+    printf("No command entered. Exiting...\n");
+    exit(1);
   }
-  if(commands != 'p' || commands != 'q' || commands != 'd' || commands != 'n'){
+
+  
+  if (commands[0] == '\n') {
+    printf("No command entered. Exiting...\n");
+    exit(1);
+  }
+
+  
+  char command = commands[0];
+
+  
+  if (command != 'p' && command != 'q' && command != 'd' && command != 'n') {
     printf("Wrong command. Client is quitting....You ruined it.\n");
     exit(1);
   }
-  if(commands == 'p'){
-    char players[256] = "mpg123 -C s\0";
-    strcpy(wants,players);
-  }
-  if(commands == 'q'){
-    char quitters[256] = "mpg123 -C q\0";
-    strcpy(wants,quitters);
-  }
-  if(commands == 'd'){
-    char deleters[256] = "mpg123 -C s\0";
-    strcpy(wants,players);
-    execvp("rm ")
-  }
 
-  close(server_socket);
-
+  
+  if (command == 'p') {
+    strcpy(wants, "mpg123 -C s");
   }
+  if (command == 'q') {
+    strcpy(wants, "mpg123 -C q"); // quit
+  }
+  if (command == 'd') {
+    strcpy(wants, "mpg123 -C s");
+  }
+}
 
-int main(int argc, char *argv[] ) {
-  char* IP = "127.0.0.1";
-  if(argc>1){
-    IP=argv[1];
+int main(int argc, char *argv[]) {
+  char *IP = "127.0.0.1";
+  if (argc > 1) {
+    IP = argv[1];
   }
   signal(SIGINT, sighandler);
   int server_socket = client_tcp_handshake(IP);
   printf("client connected.\n");
   clientLogic(server_socket);
-
 }
