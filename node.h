@@ -11,6 +11,7 @@
 #include <math.h>
 
 struct song_node{char artist[100];char title[100]; char filepath[256]; struct song_node *next;};
+char * string_song_node(struct song_node m);
 int print_song_node(struct song_node m);
 struct song_node * createnode(char artist[100], char title[100], char filepath[256], struct song_node *next);
 struct song_node * insert_front(struct song_node * list,char * artist, char * title, char * filepath);

@@ -9,6 +9,16 @@ int print_song_node(struct song_node m){
 	printf("%s, %s \n", m.artist, m.title);
 	return 0;
 }
+
+char * string_song_node(struct song_node m){
+	char * returnable;
+	const char * dashes = " - ";
+	const char * line = "\n";
+	strcpy(returnable, m.artist);
+	strcat(returnable, dashes);
+	strcat(returnable, m.title);
+	strcat(returnable, line);
+}
 //below is needed just might need some modifications depending on how i want each thing to be....seems to be especially true if i want to do mpg files
 struct song_node * createnode(char artist[100], char title[100], char filepath[256], struct song_node *next){
     struct song_node *p = (struct song_node*) malloc(sizeof(struct song_node));
@@ -69,7 +79,7 @@ struct song_node * front_abc(struct song_node * list, char * artist, char * titl
 
 //yeah prob needed
 
-void print_song_list(struct song_node * list){
+char * print_song_list(struct song_node * list){
     struct song_node * current = list;
     while(current != NULL){
         printf("[%s,%s] | ",current->artist,current->title);//iterates through the list until therer is nothing left printing the artist followed by the title

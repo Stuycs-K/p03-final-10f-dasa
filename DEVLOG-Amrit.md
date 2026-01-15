@@ -30,3 +30,7 @@ This document must be updated daily every time you finish a work session.
 
 ### 2026-01-14- Brief description
 * Worked on better understanding mpg123 and updating the client side to deal with commands and interactions with mpg123
+* The mpg123 seems to be functioning. Now, it's all about debugging.
+
+### 2026-01-15- Brief description
+* Debugging + video

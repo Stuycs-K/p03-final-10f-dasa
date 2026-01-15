@@ -76,7 +76,7 @@ char** string_list(struct song_node * list, int *count){
     }
     *count = n;
     if(n == 0){
-        return NULL;    
+        return NULL;
     }
     char **songs = malloc(sizeof(char*) * n);
     current = list;
@@ -96,14 +96,22 @@ char ** by_letter(struct song_node ** library, char letter, int * count){
     if(index < 0 || index > 25){
         index = 26;
     }
-    return string_list(library[index], count);
+    int n = sizeof(&library);
+
+    struct song_node * node = &library;
+    char **titles = malloc((sizeof(char *)) * n);
+    for(int x = 0; x < n; x++){
+      titles[x] = string_song_node(*node);
+      node = node -> next;
+    }
+    return titles;
 }
 
 
 char ** by_artist(struct song_node ** library, char* artist, int *count){
-    if(!artist){ 
-        *count=0; 
-        return NULL; 
+    if(!artist){
+        *count=0;
+        return NULL;
     }
 
     int index = *artist - 'A';
@@ -113,9 +121,9 @@ char ** by_artist(struct song_node ** library, char* artist, int *count){
 
 
     struct song_node *node = search_artist(library, artist, NULL);
-    if(!node){ 
-        *count=0; 
-        return NULL; 
+    if(!node){
+        *count=0;
+        return NULL;
     }
 
     int n = 0;
@@ -125,15 +133,11 @@ char ** by_artist(struct song_node ** library, char* artist, int *count){
         cur = cur->next;
     }
     *count = n;
-
-    char **titles = malloc(sizeof(char*) * n);
+    char **titles = malloc((sizeof(char *)) * n);
     cur = node;
-    int i = 0;
-    while(cur && strcasecmp(cur->artist, artist) == 0){
-        titles[i] = malloc(strlen(cur->title) + 1);
-        strcpy(titles[i], cur->title);
-        i++;
-        cur = cur->next;
+    for(int x = 0; x < n; x++){
+      titles[x] = string_song_node(*cur);
+      cur = cur -> next;
     }
     return titles;
 }
