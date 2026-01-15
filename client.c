@@ -6,8 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
-// #include <mpg123.h>
+#include "audios.h"
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
@@ -75,43 +76,46 @@ void clientLogic(int server_socket) {
   }
   send(server_socket, buff, strlen(buff) + 1, 0);
 
-  printf("Enjoy the song. If you would like to pause press p; exit press q; "
-         "delete song press d; go to the next song press n. Command: \n");
+  int player_pid;
+  int player_fd;
+  player_pid = play_song_pipev(current_song, &player_fd);
 
-  
-  char commands[2]; 
-  char wants[256];
+  char commands[2];
+  while (1) {
+    printf("Enjoy the song. If you would like to pause press p; unpause press u; exit press q; delete song press d; go to the next song press n. Command: \n");
+    char wants[256];
 
-  
-  if (fgets(commands, sizeof(commands), stdin) == NULL) {
-    printf("No command entered. Exiting...\n");
-    exit(1);
-  }
+    if (fgets(commands, sizeof(commands), stdin) == NULL) {
+      printf("No command entered. Exiting...\n");
+      exit(1);
+    }
 
-  
-  if (commands[0] == '\n') {
-    printf("No command entered. Exiting...\n");
-    exit(1);
-  }
+    if (commands[0] == '\n') {
+      printf("No command entered. Exiting...\n");
+      exit(1);
+    }
 
-  
-  char command = commands[0];
+    char command = commands[0];
 
-  
-  if (command != 'p' && command != 'q' && command != 'd' && command != 'n') {
-    printf("Wrong command. Client is quitting....You ruined it.\n");
-    exit(1);
-  }
+    if (command != 'p' && command != 'q' && command != 'd' && command != 'n' &&
+        command != 'u') {
+      printf("Wrong command. Client is quitting....You ruined it.\n");
+      exit(1);
+    }
 
-  
-  if (command == 'p') {
-    strcpy(wants, "mpg123 -C s");
-  }
-  if (command == 'q') {
-    strcpy(wants, "mpg123 -C q"); // quit
-  }
-  if (command == 'd') {
-    strcpy(wants, "mpg123 -C s");
+    if (command == 'p') {
+      send_client(player_pid, player_fd, 'p');
+    }
+    if (command == 'q') {
+      send_client(player_pid, player_fd, 'q');
+    }
+    if (command == 'd') {
+      send_client(player_pid, player_fd, 'q');
+      delete_song(current_song);
+    }
+    if(command == 'n'){
+      send_client(player_pid, player_fd, 'q');
+    }
   }
 }
 
