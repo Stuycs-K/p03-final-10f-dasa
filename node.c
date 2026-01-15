@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-struct song_node{char artist[100];char title[100]; struct song_node *next;};
+struct song_node{char artist[100];char title[100]; char filepath[256]; struct song_node *next;};
 //ok below is needed
 int print_song_node(struct song_node m){
 	printf("%s, %s \n", m.artist, m.title);
 	return 0;
 }
 //below is needed just might need some modifications depending on how i want each thing to be....seems to be especially true if i want to do mpg files
-struct song_node * createnode(char artist[100], char title[100], struct song_node *next){
+struct song_node * createnode(char artist[100], char title[100], char filepath[256], struct song_node *next){
     struct song_node *p = (struct song_node*) malloc(sizeof(struct song_node));
 
     strncpy(p->artist, artist, 99);
@@ -19,13 +19,16 @@ struct song_node * createnode(char artist[100], char title[100], struct song_nod
     strncpy(p->title, title, 99);
     p->title[99] = '\0';
 
+    strncpy(p-> filepath, filepath, 255);
+    p-> filepath[255] = '\0';
+
     p->next = next;
     return p;
 }
 
 //ok needed since its linked list
-struct song_node * insert_front(struct song_node * list,char * artist, char * title){
-    struct song_node * newSongNode = createnode(artist,title,list);
+struct song_node * insert_front(struct song_node * list,char * artist, char * title, char * filepath){
+    struct song_node * newSongNode = createnode(artist,title,filepath, list);
     return newSongNode;
 }
 
@@ -41,8 +44,8 @@ int compare(struct song_node * a,struct song_node * b){
 }
 
 //um not really sure how this is supposed to work/be needed but alr will see in a bit (come back later)
-struct song_node * front_abc(struct song_node * list, char * artist, char * title){
-    struct song_node * newSongNode = createnode(artist,title,NULL);//null because it doesnt have a next node yet
+struct song_node * front_abc(struct song_node * list, char * artist, char * title, char * filepath){
+    struct song_node * newSongNode = createnode(artist,title, filepath, NULL);//null because it doesnt have a next node yet
 
     if(list == NULL){
         return newSongNode;//if the list is null set it equal to the new node that is created

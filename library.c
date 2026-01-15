@@ -11,8 +11,8 @@ struct song_node ** init(){
 }
 
 
-void add(struct song_node** library, char* artist, char* title) {
-    if (!artist || !title) return;
+void add(struct song_node** library, char* artist, char* title, char * filepath) {
+    if (!artist || !title || !filepath) return;
 
     int index = *artist - 'A';
     if (index < 0 || index > 25) index = 26;
@@ -21,7 +21,7 @@ void add(struct song_node** library, char* artist, char* title) {
     if(library == NULL){
         exit(0);
     }
-    struct song_node *new_node = createnode(artist, title, NULL);
+    struct song_node *new_node = createnode(artist, title,filepath, NULL);
 
     if (!access || compare(new_node, access) < 0)
     {

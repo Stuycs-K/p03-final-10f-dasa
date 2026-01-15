@@ -18,7 +18,8 @@ static void sighandler(int signo) {
 }
 
 void clientLogic(int server_socket) {
-  char buff[256];
+  char current_song[256]
+;  char buff[256];
 
   printf("Please input the first letter of the first name of the artist: ");
   if (fgets(buff, sizeof(buff), stdin) == NULL) {
@@ -111,7 +112,7 @@ void clientLogic(int server_socket) {
     }
     if (command == 'd') {
       send_client(player_pid, player_fd, 'q');
-      delete_song(current_song);
+      deleting_song(current_song);
     }
     if(command == 'n'){
       send_client(player_pid, player_fd, 'q');
