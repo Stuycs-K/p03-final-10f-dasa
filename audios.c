@@ -29,3 +29,13 @@ void stop_song(int pid){
     waitpid(pid, NULL, 0);
   }
 }
+
+void deleting_song(char * song_path){
+  int pid = fork();
+  if(pid == 0){
+    char * args[] = {"rm", song_path, NULL};
+    execvp("rm", args);
+    exit(1);
+  }
+  waitpid(pid, NULL, 0);
+}
