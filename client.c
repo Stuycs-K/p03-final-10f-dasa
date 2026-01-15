@@ -76,10 +76,20 @@ void clientLogic(int server_socket) {
     buff[strlen(buff) - 1] = '\0';
   }
   send(server_socket, buff, strlen(buff) + 1, 0);
+  strcpy(current_song, buff);
 
   int player_pid;
   int player_fd;
-  player_pid = play_song_pipev(current_song, &player_fd);
+  player_pid = play_song_pipev(&player_fd);
+
+  char buffs[1024];
+  int bytes_read;
+  bytes_read = recv(server_socket, buffs, sizeof(buffs), 0);
+  while(bytes_read > 0){
+    write(player_fd, buffs, bytes_read);
+  }
+  close(player_fd);
+  waitpid(player_pid, NULL, 0);
 
   char commands[2];
   while (1) {
@@ -105,6 +115,9 @@ void clientLogic(int server_socket) {
     }
 
     if (command == 'p') {
+      send_client(player_pid, player_fd, 'p');
+    }
+    if(command == 'u'){
       send_client(player_pid, player_fd, 'p');
     }
     if (command == 'q') {

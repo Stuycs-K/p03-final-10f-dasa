@@ -13,7 +13,7 @@
 #include <sys/wait.h>
 
 
-int play_song_pipev(char * song_path, int *write_fd){
+int play_song_pipev(int *write_fd){
   int fd[2];
   if(pipe(fd) == -1){
     exit(1);
@@ -25,7 +25,7 @@ int play_song_pipev(char * song_path, int *write_fd){
     close(fd[0]);
     close(fd[1]);
 
-    char *args[] = {"mpg123", "-C", song_path, NULL};
+    char *args[] = {"mpg123", "-C", "-", NULL};
     execvp("mpg123", args);
     exit(1);
   }

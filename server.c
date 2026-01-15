@@ -19,6 +19,7 @@ static void sighandler(int signo) {
 
 void subserver_logic(int client_socket, struct song_node ** library) {
   char letter;
+  //reciecing letter
   int sizes = recv(client_socket, &letter, sizeof(letter), 0);
   if(sizes <= 0){
     printf("Socket closed.\n");
@@ -58,7 +59,23 @@ void subserver_logic(int client_socket, struct song_node ** library) {
   char buffer[256];
   sprintf(buffer, "%s - %s", song-> artist, song-> title);
   int len = strlen(buffer) + 1;
-  send(client_socket, buffer, len, 0);
+
+
+  int fd = open(song -> filepath, O_RDONLY);
+  if(fd < 0){
+    strerror(errno);
+    close(client_socket);
+    exit(1);
+  }
+  char buffs[1024];
+  int bytes_read;
+  bytes_read = read(fd, buffer, sizeof(buffer));
+  while(bytes_read > 0){
+    send(client_socket, buffs, bytes_read, 0);
+    bytes_read = read(fd, buffs, sizeof(buffs));
+  }
+  close(fd);
+  printf("Finished streaming: %s - %s\n", song -> artist, song -> title);
 }
 
 int main(int argc, char *argv[]) {
