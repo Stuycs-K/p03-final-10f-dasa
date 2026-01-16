@@ -68,13 +68,18 @@ void subserver_logic(int client_socket, struct song_node **library) {
   }
   free_song_array(songs, count);
 
-  char artist[256] = {0};
-  recv(client_socket, artist, sizeof(artist), 0);
+  char artist[256] = {0};;
 
+  if(recv(client_socket, artist, sizeof(artist), 0) <= 0){
+    printf("Quit needed.\n", artist);
+    close(client_socket);
+    exit(0);
+  }
   songs = by_artist(library, artist, &count);
   if(count == 0){
-    printf("Artist '%s' not found. Closing connection.\n", artist);
+    printf("Invalid artist.\n", artist);
     close(client_socket);
+    exit(0);
   }
   send(client_socket, &count, sizeof(int), 0);
   for (int x = 0; x < count; x++) {
@@ -94,6 +99,7 @@ void subserver_logic(int client_socket, struct song_node **library) {
   if(song == NULL){
     printf("Song %s by %s not found. Closing connection.\n", title, artist);
     close(client_socket);
+    exit(0);
   }
   char buffer[256];
   sprintf(buffer, "%s - %s", song->artist, song->title);

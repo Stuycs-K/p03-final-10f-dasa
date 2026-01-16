@@ -31,27 +31,49 @@ int play_song_pipev(int *write_fd){
 
 
 void stream_song(int server_socket){
-  int player_pid;
-  int player_fd;
-  player_pid = play_song_pipev(&player_fd);
+    int player_pid;
+    int player_fd;
+    player_pid = play_song_pipev(&player_fd);
 
-  char buffs[4096];
-  int bytes_read;
-  while ((bytes_read = recv(server_socket, buffs, sizeof(buffs),0)) > 0) {
-    int writing = 0;
-    while(writing < bytes_read){
-      int a = write(player_fd, buffs + writing , bytes_read - writing);
-      if(a <= 0){
-        strerror(errno);
-        exit(1);
-      }
-      writing += a;
+    size_t filesize;
+    int bytes = recv(server_socket, &filesize, sizeof(filesize), 0);
+    if (bytes <= 0) {
+        close(player_fd);
+        return;
     }
-  }
-  close(player_fd);
-  waitpid(player_pid, NULL, 0);
 
+    char buffs[4096];
+    size_t total_received = 0;
+
+    while (total_received < filesize) {
+        int to_read = sizeof(buffs);
+        if (filesize - total_received < sizeof(buffs)) {
+            to_read = filesize - total_received;
+        }
+
+        int r = recv(server_socket, buffs, to_read, 0);
+        if (r <= 0) {
+            break;
+        }
+
+        int written = 0;
+        while (written < r) {
+            int w = write(player_fd, buffs + written, r - written);
+            if (w <= 0) {
+                close(player_fd);
+                return;
+            }
+            written += w;
+        }
+
+        total_received += r;
+    }
+
+    close(player_fd);
+    waitpid(player_pid, NULL, 0);
 }
+
+
 
 
 void send_client(int player_pid, int write_fd, char command){

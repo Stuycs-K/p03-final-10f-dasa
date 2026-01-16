@@ -16,26 +16,40 @@ static void sighandler(int signo) {
   }
 }
 
-void client_song(int server_socket, int *player_pid, int *player_fd) {
-  int filesize;
-  recv(server_socket, &filesize, sizeof(filesize), 0);
-  *player_pid = play_song_pipev(player_fd);
-  char buffs[4096];
-  int total_received = 0;
-  while (total_received < filesize) {
-    int to_read = sizeof(buffs);
-    if (filesize - total_received < sizeof(buffs)) {
-      to_read = filesize - total_received;
+void client_song(int server_socket) {
+    pid_t child = fork();
+
+    if (child == 0) {
+        stream_song(server_socket);
+        exit(0);
     }
-    int r = recv(server_socket, buffs, to_read, 0);
-    if (r <= 0){
-      break;
+
+    while (1) {
+        char commands[8];
+        printf("Commands: p=pause, u=unpause, q=quit\n");
+
+        if (fgets(commands, sizeof(commands), stdin) == NULL) {
+            kill(child, SIGTERM);
+            waitpid(child, NULL, 0);
+            break;
+        }
+
+        char cmd = commands[0];
+
+        if (cmd == 'p') {
+            kill(child, SIGSTOP);
+        } else if (cmd == 'u') {
+            kill(child, SIGCONT);
+        } else if (cmd == 'q') {
+            char stop_signal = 1;
+            send(server_socket, &stop_signal, 1, 0);
+
+            kill(child, SIGTERM);
+            waitpid(child, NULL, 0);
+            exit(0);
+            break;
+        }
     }
-    write(*player_fd, buffs, r);
-    total_received += r;
-  }
-  close(*player_fd);
-  waitpid(*player_pid, NULL, 0);
 }
 
 int clientLogic(int server_socket) {
@@ -47,20 +61,20 @@ int clientLogic(int server_socket) {
     if (fgets(buff, sizeof(buff), stdin) == NULL) {
       printf("Client done.\n");
       close(server_socket);
-      return 1;
+      return -1;
     }
 
     if (buff[0] == '\n' || buff[0] == '\0') {
       printf("No input provided.\n");
       close(server_socket);
-      return 1;
+      return -1;
     }
 
     char letter = buff[0];
     if (send(server_socket, &letter, 1, 0) <= 0) {
       printf("Failed to send letter.\n");
       close(server_socket);
-      return 1;
+      return -1;
     }
 
     int count;
@@ -75,7 +89,8 @@ int clientLogic(int server_socket) {
                      256 - bytes_received, 0);
         if (r <= 0) {
           printf("Connection closed.\n");
-          exit(1);
+          close(server_socket);
+          return -1;
         }
         bytes_received += r;
       }
@@ -85,11 +100,17 @@ int clientLogic(int server_socket) {
 
     printf("Enter artist: ");
     fgets(buff, sizeof(buff), stdin);
-    if (buff[strlen(buff) - 1] == '\n')
+    if (buff[strlen(buff) - 1] == '\n') {
       buff[strlen(buff) - 1] = '\0';
+    }
     send(server_socket, buff, 256, 0);
 
     recv(server_socket, &count, sizeof(int), 0);
+    if (count <= 0) {
+      printf("Invalid input");
+      close(server_socket);
+      return -1;
+    }
     songs = malloc(count * sizeof(char *));
     for (int x = 0; x < count; x++) {
       songs[x] = malloc(256);
@@ -101,41 +122,11 @@ int clientLogic(int server_socket) {
     fgets(buff, sizeof(buff), stdin);
     buff[strcspn(buff, "\n")] = 0;
     send(server_socket, buff, 256, 0);
-    int player_pid, player_fd;
-    pid_t child = fork();
-    if (child == 0) {
-      client_song(server_socket, &player_pid, &player_fd);
-      exit(0);
-    }
-    while (1) {
-      char commands[2];
-      printf("Commands: p=u, u=unpause, q=quit, n=next, > louder, < quieter\n");
-      if (fgets(commands, sizeof(commands), stdin) == NULL) {
-        stop_song(player_pid);
-        kill(child, SIGTERM);
-        return -1;
-      }
-      char cmd = commands[0];
-      if (cmd == '>' || cmd == '<' || cmd == 'p' || cmd == 'u'){
-        send_client(player_pid, player_fd, cmd);
-      }
-      if (cmd == 'q') {
-        stop_song(player_pid);
-        kill(child, SIGTERM);
-        waitpid(child, NULL, 0);
-        return -1;
-      }
-      /*
-      if (cmd == 'n') {
-        stop_song(player_pid);
-        kill(child, SIGTERM);
-        sleep(3.5);
-        break;
-      }
-      */
-    }
+    client_song(server_socket);
+
+    printf("Playback finished.\n");
   }
-  return 0;
+return 0;
 }
 
 int main(int argc, char *argv[]) {
