@@ -72,6 +72,10 @@ void subserver_logic(int client_socket, struct song_node **library) {
   recv(client_socket, artist, sizeof(artist), 0);
 
   songs = by_artist(library, artist, &count);
+  if(count == 0){
+    printf("Artist '%s' not found. Closing connection.\n", artist);
+    close(client_socket);
+  }
   send(client_socket, &count, sizeof(int), 0);
   for (int x = 0; x < count; x++) {
     char temp[256] = {0};
@@ -87,10 +91,15 @@ void subserver_logic(int client_socket, struct song_node **library) {
     exit(1);
   }
   struct song_node *song = search_song(library, artist, title);
+  if(song == NULL){
+    printf("Song %s by %s not found. Closing connection.\n", title, artist);
+    close(client_socket);
+  }
   char buffer[256];
   sprintf(buffer, "%s - %s", song->artist, song->title);
   int len = strlen(buffer) + 1;
-  send_song(client_socket, "USA.ogg.mp3");
+  printf("%s\n", song->filepath);
+  send_song(client_socket, song->filepath);
 }
 
 int main(int argc, char *argv[]) {
@@ -218,12 +227,15 @@ int main(int argc, char *argv[]) {
   
 
   struct song_node **library = init();
-  add(library, "Francis Scott Key", "Star-Spangled Banner", "/home/user/music/USA.ogg.mp3");
-  add(library, "Robert Stanley weir", "O Canada", "/home/user/music/OCanada.oga.mp3");
-  add(library, "Joseph Haydn", "Deustchlandlied", "/home/user/music/GermanHymn.ogg.mp3");
-  add(library, "Rabindranath Tagore", "Jana Gana Mana", "/home/user/music/India.ogg.mp3");
-  add(library, "Sergei Mikhalkov", "State Anthem of the Russian Federation", "/home/user/music/Russia.ogg.mp3");
-  add(library, "UK", "God Save the King", "/home/user/music/UK.oga.mp3");
+  add(library, "Francis Scott Key", "Star-Spangled Banner", "USA.ogg.mp3");
+  add(library, "Robert Stanley weir", "O Canada", "OCanada.oga.mp3");
+  add(library, "Joseph Haydn", "Deustchlandlied", "GermanHymn.ogg.mp3");
+  add(library, "Rabindranath Tagore", "Jana Gana Mana", "India.ogg.mp3");
+  add(library, "Sergei Mikhalkov", "State Anthem of the Russian Federation", "Russia.ogg.mp3");
+  add(library, "UK", "God Save the King", "UK.oga.mp3");
+  add(library, "UK", "Hark the Herald Angels Sing", "Angels.ogg.mp3");
+  add(library, "John Francis Wade", "Adeste Fideles", "AdesteFideles.ogg.mp3");
+  add(library, "Julia Ward Howe", "Battle Hymn of the Republic", "BattleHymn.ogg.mp3");
   add(library, "Taylor Swift", "Love Story",
       "/home/user/music/Taylor_Swift_Love_Story.mp3");
   add(library, "Taylor Swift", "Blank Space",
