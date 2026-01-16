@@ -118,7 +118,26 @@ char ** by_artist(struct song_node ** library, char* artist, int *count){
         *count=0;
         return NULL;
     }
-    return string_list(node,count);
+    struct song_node *cur = node;
+    int n = 0;
+    while(cur && strcmp(cur-> artist, artist) == 0){
+        n++;
+        cur = cur -> next;
+    }
+
+    *count = n;
+
+    char ** songs = malloc(sizeof(char *) * n);
+
+    cur = node;
+    int x = 0;
+    while(cur && strcmp(cur -> artist, artist) == 0){
+        songs[x] = malloc(strlen(cur -> artist) + strlen(cur -> title) + 4);
+        sprintf(songs[x], "%s - %s", cur -> artist, cur -> title);
+        x++;
+        cur = cur -> next;
+    }
+    return songs;
 }
 
 void print_library(struct song_node** library){
