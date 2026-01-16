@@ -1,7 +1,6 @@
 #include "library.h"
 #include "networking.h"
 #include "node.h"
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,12 +37,12 @@ void send_song(int client_socket, char * filepath){
     int sending = 0;
     while(sending < bytes_read){
       int s = send(client_socket, buffs + sending, bytes_read - sending, 0);
-      if(s <= 0){
+      if(s < 0){
         strerror(errno);
         fclose(fp);
         exit(1);
-        sending += s;
       }
+      sending += s;
     }
   }
   fclose(fp);

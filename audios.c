@@ -1,12 +1,6 @@
-
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "node.h"
-#include "library.h"
-#include "server.h"
-#include "client.h"
 #include <string.h>
 #include <sys/stat.h>
 #include <signal.h>

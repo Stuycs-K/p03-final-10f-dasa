@@ -1,7 +1,5 @@
 #include "audios.h"
-#include "library.h"
 #include "networking.h"
-#include "node.h"
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
@@ -19,25 +17,35 @@ static void sighandler(int signo) {
 }
 
 void client_song(int server_socket){
-  size_t filesize;
+  int filesize;
   recv(server_socket, &filesize, sizeof(filesize), 0);
 
-  char *song_buff = malloc(filesize);
-  int total_recieve = 0;
-  while(total_recieve < filesize){
-    int r = recv(server_socket, song_buff + total_recieve, filesize - total_recieve, 0);
-    if(r <= 0){
-      exit(1);
-    }
-    total_recieve += r;
-  }
   int write_fd;
   int pid = play_song_pipev(&write_fd);
-  write(write_fd,song_buff,filesize);
+
+  char buffs[4096];
+  int total_recieved = 0;
+  while(total_recieved < filesize){
+    int to_read = sizeof(buffs);
+    if(filesize - total_recieved < sizeof(buffs)){
+      to_read = filesize - total_recieved;
+    }
+    int r = recv(server_socket, buffs, to_read, 0);
+    if(r <= 0){
+      strerror(errno);
+      close(write_fd);
+      waitpid(pid,NULL,0);
+      exit(1);
+    }
+
+    write(write_fd,buffs,r);
+    total_recieved+=r;
+  }
   close(write_fd);
-  free(song_buff);
-  waitpid(pid, NULL, 0);
+  waitpid(pid,NULL,0);
 }
+
+
 void clientLogic(int server_socket) {
   char current_song[256];
   char buff[256];
