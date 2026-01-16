@@ -33,4 +33,4 @@ This document must be updated daily every time you finish a work session.
 * The mpg123 seems to be functioning. Now, it's all about debugging.
 
 ### 2026-01-15- Brief description
-* Debugging + video
+* Debugging + video. Basically had to go through multiple iterations of the streaming and command links. 
