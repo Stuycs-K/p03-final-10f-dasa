@@ -58,16 +58,25 @@ void subserver_logic(int client_socket, struct song_node **library) {
   int len = strlen(buffer) + 1;
 
   int fd = open(song->filepath, O_RDONLY);
-  if (fd < 0) {
+  if(fd < 0){
     strerror(errno);
     close(client_socket);
     exit(1);
   }
-  char buffs[1024];
-  int bytes_read = read(fd, buffs, sizeof(buffs));
-  while (bytes_read > 0) {
-    send(client_socket, buffs, bytes_read, 0);
-    bytes_read = read(fd, buffs, sizeof(buffs));
+
+  char buffs[4096];
+  int bytes_read;
+  while((bytes_read = read(fd, buffs, sizeof(buffs))) > 0){
+    int sending = 0;
+    while(sending < bytes_read){
+      int s = send(client_socket, buffer + sending, bytes_read - sending, 0);
+      if(s <= 0){
+        strerror(errno);
+        close(fd);
+        exit(1);
+        sending += s;
+      }
+    }
   }
   close(fd);
   printf("Finished streaming: %s - %s\n", song->artist, song->title);

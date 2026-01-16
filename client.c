@@ -88,9 +88,16 @@ void clientLogic(int server_socket) {
 
   char buffs[1024];
   int bytes_read;
-  bytes_read = recv(server_socket, buffs, sizeof(buffs), 0);
-  while (bytes_read > 0) {
-    write(player_fd, buffs, bytes_read);
+  while ((bytes_read = recv(server_socket, buffs, sizeof(buffs),0)) > 0) {
+    int writing = 0;
+    while(writing < bytes_read){
+      int a = write(player_fd, buffs + writing , bytes_read - writing);
+      if(a <= 0){
+        strerror(errno);
+        exit(1);
+      }
+      writing += a;
+    }
   }
   close(player_fd);
   waitpid(player_pid, NULL, 0);
