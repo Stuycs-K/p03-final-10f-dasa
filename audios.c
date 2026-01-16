@@ -52,12 +52,11 @@ void stream_song(int server_socket){
   waitpid(player_pid, NULL, 0);
 
 }
+
+
 void send_client(int player_pid, int write_fd, char command){
   if(player_pid > 0){
-    char buff[2];
-    buff[0] = command;
-    buff[1] = '\n';
-    write(write_fd, buff, 2);
+    write(write_fd, &command, 1);
     if(command == 'q'){
       waitpid(player_pid, NULL,0);
     }
