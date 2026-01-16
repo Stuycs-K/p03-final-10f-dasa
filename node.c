@@ -11,13 +11,9 @@ int print_song_node(struct song_node m){
 }
 
 char * string_song_node(struct song_node m){
-	char * returnable;
-	const char * dashes = " - ";
-	const char * line = "\n";
-	strcpy(returnable, m.artist);
-	strcat(returnable, dashes);
-	strcat(returnable, m.title);
-	strcat(returnable, line);
+    char * returnable = malloc(strlen(m.artist) + strlen(m.title) + 4);
+    sprintf(returnable, "%s - %s", m.artist, m.title);
+    return returnable;
 }
 //below is needed just might need some modifications depending on how i want each thing to be....seems to be especially true if i want to do mpg files
 struct song_node * createnode(char artist[100], char title[100], char filepath[256], struct song_node *next){

@@ -1,3 +1,4 @@
+#include "audios.h"
 #include "library.h"
 #include "networking.h"
 #include "node.h"
@@ -8,7 +9,6 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "audios.h"
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
@@ -18,8 +18,8 @@ static void sighandler(int signo) {
 }
 
 void clientLogic(int server_socket) {
-  char current_song[256]
-;  char buff[256];
+  char current_song[256];
+  char buff[256];
 
   printf("Please input the first letter of the first name of the artist: ");
   if (fgets(buff, sizeof(buff), stdin) == NULL) {
@@ -47,20 +47,24 @@ void clientLogic(int server_socket) {
   printf("Songs for letter %c: \n", letter);
   for (int x = 0; x < count; x++) {
     songs[x] = malloc(256);
-    recv(server_socket, songs[x], 256, 0);
+    int bytes_received = 0;
+    while (bytes_received < 256) {
+      int r = recv(server_socket, songs[x] + bytes_received,
+                   256 - bytes_received, 0);
+      if (r <= 0) {
+        printf("Connection closed.\n");
+        exit(1);
+      }
+      bytes_received += r;
+    }
     printf("%s\n", songs[x]);
   }
-  for (int x = 0; x < count; x++) {
-    free(songs[x]);
-  }
-  free(songs);
 
   printf("Enter artist: ");
   fgets(buff, sizeof(buff), stdin);
-  if (buff[strlen(buff) - 1] == '\n') {
+  if (buff[strlen(buff) - 1] == '\n')
     buff[strlen(buff) - 1] = '\0';
-  }
-  send(server_socket, buff, strlen(buff) + 1, 0);
+  send(server_socket, buff, 256, 0);
 
   recv(server_socket, &count, sizeof(int), 0);
   songs = malloc(count * sizeof(char *));
@@ -75,7 +79,7 @@ void clientLogic(int server_socket) {
   if (buff[strlen(buff) - 1] == '\n') {
     buff[strlen(buff) - 1] = '\0';
   }
-  send(server_socket, buff, strlen(buff) + 1, 0);
+  send(server_socket, buff, sizeof(buff), 0);
   strcpy(current_song, buff);
 
   int player_pid;
@@ -85,7 +89,7 @@ void clientLogic(int server_socket) {
   char buffs[1024];
   int bytes_read;
   bytes_read = recv(server_socket, buffs, sizeof(buffs), 0);
-  while(bytes_read > 0){
+  while (bytes_read > 0) {
     write(player_fd, buffs, bytes_read);
   }
   close(player_fd);
@@ -93,7 +97,9 @@ void clientLogic(int server_socket) {
 
   char commands[2];
   while (1) {
-    printf("Enjoy the song. If you would like to pause press p; unpause press u; exit press q; delete song press d; go to the next song press n. Command: \n");
+    printf("Enjoy the song. If you would like to pause press p; unpause press "
+           "u; exit press q; delete song press d; go to the next song press n. "
+           "Command: \n");
     char wants[256];
 
     if (fgets(commands, sizeof(commands), stdin) == NULL) {
@@ -117,7 +123,7 @@ void clientLogic(int server_socket) {
     if (command == 'p') {
       send_client(player_pid, player_fd, 'p');
     }
-    if(command == 'u'){
+    if (command == 'u') {
       send_client(player_pid, player_fd, 'p');
     }
     if (command == 'q') {
@@ -127,7 +133,7 @@ void clientLogic(int server_socket) {
       send_client(player_pid, player_fd, 'q');
       deleting_song(current_song);
     }
-    if(command == 'n'){
+    if (command == 'n') {
       send_client(player_pid, player_fd, 'q');
     }
   }

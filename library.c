@@ -96,15 +96,8 @@ char ** by_letter(struct song_node ** library, char letter, int * count){
     if(index < 0 || index > 25){
         index = 26;
     }
-    int n = sizeof(&library);
-
-    struct song_node * node = &library;
-    char **titles = malloc((sizeof(char *)) * n);
-    for(int x = 0; x < n; x++){
-      titles[x] = string_song_node(*node);
-      node = node -> next;
-    }
-    return titles;
+    struct song_node * node = library[index];
+    return string_list(node, count);
 }
 
 
@@ -125,21 +118,7 @@ char ** by_artist(struct song_node ** library, char* artist, int *count){
         *count=0;
         return NULL;
     }
-
-    int n = 0;
-    struct song_node *cur = node;
-    while(cur && strcasecmp(cur->artist, artist) == 0){
-        n++;
-        cur = cur->next;
-    }
-    *count = n;
-    char **titles = malloc((sizeof(char *)) * n);
-    cur = node;
-    for(int x = 0; x < n; x++){
-      titles[x] = string_song_node(*cur);
-      cur = cur -> next;
-    }
-    return titles;
+    return string_list(node,count);
 }
 
 void print_library(struct song_node** library){
