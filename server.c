@@ -4,7 +4,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 static void sighandler(int signo) {
   if (signo == SIGINT) {
@@ -12,6 +14,39 @@ static void sighandler(int signo) {
     printf("Interruption");
     exit(0);
   }
+}
+
+void send_song(int client_socket, char * filepath){
+  struct stat st;
+  if(stat(filepath, &st) != 0){
+    strerror(errno);
+    close(client_socket);
+    exit(1);
+  }
+  size_t filesize = st.st_size;
+  send(client_socket, &filesize, sizeof(filesize),0);
+  FILE *fp = fopen(filepath, "rb");
+  if(fp == NULL){
+    strerror(errno);
+    close(client_socket);
+    exit(1);
+  }
+
+  char buffs[4096];
+  int bytes_read;
+  while((bytes_read = fread(buffs,1, sizeof(buffs), fp)) > 0){
+    int sending = 0;
+    while(sending < bytes_read){
+      int s = send(client_socket, buffs + sending, bytes_read - sending, 0);
+      if(s <= 0){
+        strerror(errno);
+        fclose(fp);
+        exit(1);
+        sending += s;
+      }
+    }
+  }
+  fclose(fp);
 }
 
 void subserver_logic(int client_socket, struct song_node **library) {
@@ -56,30 +91,7 @@ void subserver_logic(int client_socket, struct song_node **library) {
   char buffer[256];
   sprintf(buffer, "%s - %s", song->artist, song->title);
   int len = strlen(buffer) + 1;
-
-  int fd = open(song->filepath, O_RDONLY);
-  if(fd < 0){
-    strerror(errno);
-    close(client_socket);
-    exit(1);
-  }
-
-  char buffs[4096];
-  int bytes_read;
-  while((bytes_read = read(fd, buffs, sizeof(buffs))) > 0){
-    int sending = 0;
-    while(sending < bytes_read){
-      int s = send(client_socket, buffer + sending, bytes_read - sending, 0);
-      if(s <= 0){
-        strerror(errno);
-        close(fd);
-        exit(1);
-        sending += s;
-      }
-    }
-  }
-  close(fd);
-  printf("Finished streaming: %s - %s\n", song->artist, song->title);
+  send_song(client_socket, "USA.ogg.mp3");
 }
 
 int main(int argc, char *argv[]) {

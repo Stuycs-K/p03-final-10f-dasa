@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 static void sighandler(int signo) {
@@ -17,6 +18,26 @@ static void sighandler(int signo) {
   }
 }
 
+void client_song(int server_socket){
+  size_t filesize;
+  recv(server_socket, &filesize, sizeof(filesize), 0);
+
+  char *song_buff = malloc(filesize);
+  int total_recieve = 0;
+  while(total_recieve < filesize){
+    int r = recv(server_socket, song_buff + total_recieve, filesize - total_recieve, 0);
+    if(r <= 0){
+      exit(1);
+    }
+    total_recieve += r;
+  }
+  int write_fd;
+  int pid = play_song_pipev(&write_fd);
+  write(write_fd,song_buff,filesize);
+  close(write_fd);
+  free(song_buff);
+  waitpid(pid, NULL, 0);
+}
 void clientLogic(int server_socket) {
   char current_song[256];
   char buff[256];
@@ -57,6 +78,7 @@ void clientLogic(int server_socket) {
       }
       bytes_received += r;
     }
+
     printf("%s\n", songs[x]);
   }
 
@@ -82,26 +104,8 @@ void clientLogic(int server_socket) {
   send(server_socket, buff, sizeof(buff), 0);
   strcpy(current_song, buff);
 
-  int player_pid;
-  int player_fd;
-  player_pid = play_song_pipev(&player_fd);
-
-  char buffs[1024];
-  int bytes_read;
-  while ((bytes_read = recv(server_socket, buffs, sizeof(buffs),0)) > 0) {
-    int writing = 0;
-    while(writing < bytes_read){
-      int a = write(player_fd, buffs + writing , bytes_read - writing);
-      if(a <= 0){
-        strerror(errno);
-        exit(1);
-      }
-      writing += a;
-    }
-  }
-  close(player_fd);
-  waitpid(player_pid, NULL, 0);
-
+  client_song(server_socket);
+  //stream_song(server_socket);
   char commands[2];
   while (1) {
     printf("Enjoy the song. If you would like to pause press p; unpause press "
@@ -112,36 +116,6 @@ void clientLogic(int server_socket) {
     if (fgets(commands, sizeof(commands), stdin) == NULL) {
       printf("No command entered. Exiting...\n");
       exit(1);
-    }
-
-    if (commands[0] == '\n') {
-      printf("No command entered. Exiting...\n");
-      exit(1);
-    }
-
-    char command = commands[0];
-
-    if (command != 'p' && command != 'q' && command != 'd' && command != 'n' &&
-        command != 'u') {
-      printf("Wrong command. Client is quitting....You ruined it.\n");
-      exit(1);
-    }
-
-    if (command == 'p') {
-      send_client(player_pid, player_fd, 'p');
-    }
-    if (command == 'u') {
-      send_client(player_pid, player_fd, 'p');
-    }
-    if (command == 'q') {
-      send_client(player_pid, player_fd, 'q');
-    }
-    if (command == 'd') {
-      send_client(player_pid, player_fd, 'q');
-      deleting_song(current_song);
-    }
-    if (command == 'n') {
-      send_client(player_pid, player_fd, 'q');
     }
   }
 }
